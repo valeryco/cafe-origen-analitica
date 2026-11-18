@@ -77,3 +77,47 @@ Las funciones fueron probadas y validadas con tres escenarios diferentes:
 | 1 | `1 * 50000 = 50000` | `0` | `50000` | `1` |
 | 2 | `2 * 25000 = 50000` | `50000` | `100000` | `2` |
 * **Cálculo final:** `100000 / 2 = 50000`.
+
+## Análisis Funcional
+
+### 1. `totalVendidoM(ventas)`
+- **¿Qué recorro?:** El arreglo `ventas` completo.
+- **¿Qué filtro?:** Descartamos los registros con `cantidad <= 0` (como el caso borde de la venta 8).
+- **¿Qué transformo?:** No aplicamos `.map()`; pasamos directamente los objetos filtrados al acumulador.
+- **¿Qué acumulo?:** El valor monetario total (`cantidad * precio`) de las ventas válidas.
+- **¿Cómo agrupo?:** No agrupa, reduce toda la colección a un único valor numérico total.
+
+### 2. `unidadesVendidasM(ventas)`
+- **Qué recorro?:** El arreglo `ventas` completo.
+- **Qué filtro?:** Las ventas con `cantidad > 0`.
+- **Qué transformo?:** Ninguna transformación previa de datos.
+- **Qué acumulo?:** El número entero de unidades compradas (`venta.cantidad`).
+- **¿Cómo agrupo?:** No agrupa, reduce la colección a un total global de unidades.
+
+### 3. `ventasPorCiudadM(ventas, ciudadBuscada)`
+- **Qué recorro?:** El arreglo `ventas` completo.
+- **Qué filtro?:** Las ventas con `cantidad > 0` y cuya ciudad normalizada (`.trim().toLowerCase()`) coincida exactamente con la ciudad buscada.
+- **Qué transformo?:** Normalización de texto en la ciudad para evitar errores de mayúsculas o espacios.
+- **Qué acumulo?:** El valor monetario de las transacciones que cumplen la condición de la ciudad.
+- **¿Cómo agrupo?:** No agrupa por todas las ciudades, sino que filtra y reduce para obtener el total de una ciudad específica.
+
+### 4. `totalPorCiudad(ventas)`
+- **Qué recorro?:** El arreglo `ventas` completo.
+- **Qué filtro?:** Las ventas con `cantidad > 0`.
+- **Qué transformo?:** Normalización de la cadena de texto de la ciudad (aplicando `.trim().toLowerCase()` y capitalizando la primera letra) para evitar duplicados por errores tipográficos.
+- **Qué acumulo?:** Un objeto en forma de **diccionario** (`{}`) donde las llaves son las ciudades y los valores son acumulaciones de dinero.
+- **¿Cómo agrupo?:** Usando la ciudad normalizada como clave acumuladora del diccionario: `diccionario[ciudad] = (diccionario[ciudad] || 0) + valorVenta(v)`.
+
+### 5. `unidadesPorProducto(ventas)`
+- **Qué recorro?:** El arreglo `ventas` completo.
+- **Qué filtro?:** Las ventas con `cantidad > 0`.
+- **Qué transformo?:** Normalización del nombre del producto usando `.trim()` para limpiar espacios sobrantes.
+- **Qué acumulo?:** Un objeto diccionario (`{}`) que suma las unidades correspondientes a cada producto.
+- **¿Cómo agrupo?:** Usando el nombre del producto como clave del diccionario: `diccionario[producto] = (diccionario[producto] || 0) + venta.cantidad`.
+
+### 6. `topProductosPorValor(ventas, k)`
+- **Qué recorro?:** Primero el arreglo `ventas` para la reducción inicial y posteriormente las entradas del diccionario resultante (`Object.entries`).
+- **Qué filtro?:** Las ventas con `cantidad > 0`.
+- **Qué transformo?:** Transformamos el objeto diccionario de agrupaciones en un arreglo plano de objetos usando `.map(([producto, total]) => ({ producto, total }))`.
+- **Qué acumulo?:** El dinero total generado por cada producto mediante `.reduce()`.
+- **¿Cómo agrupo y ordeno?:** Agrupamos por producto en un diccionario de dinero, luego convertimos a arreglo, ordenamos de forma descendente usando `.sort((a, b) => b.total - a.total)` sobre una copia inmutable (`[...]`), y recortamos con `.slice(0, k)`.

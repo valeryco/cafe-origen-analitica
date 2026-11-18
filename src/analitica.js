@@ -80,11 +80,86 @@ function ventasPorCiudad(ventas, ciudadBuscada) {
 return totalCiudad;
 }
 
+//total vendido con filter y reduce
+function totalVendidoM(ventas) {
+    return ventas
+    .filter(venta => venta.cantidad > 0) // Filtramos ventas con cantidad > 0
+    .reduce((acumulador, venta) => acumulador + valorVenta(venta), 0); // Sumamos los valores de las ventas filtradas
+}
+
+//unidades vendidas con filter y reduce
+function unidadesVendidasM(ventas) {
+    return ventas
+    .filter(venta => venta.cantidad > 0) // Filtramos ventas con cantidad > 0
+    .reduce((acumulador, venta) => acumulador + venta.cantidad, 0); // Sumamos las cantidades de las ventas filtradas
+}
+
+//venta por ciudad con filter y reduce
+function ventasPorCiudadM(ventas, ciudadBuscada) {
+    const ciudadLimpia = ciudadBuscada.trim().toLowerCase();
+
+    return ventas
+        .filter(venta => venta.ciudad.trim().toLowerCase() === ciudadLimpia && venta.cantidad > 0)
+        .reduce((acumulador, venta) => acumulador + valorVenta(venta), 0);
+}
+
+//total por ciudad con diccionario
+function totalPorCiudad(ventas) {
+    return ventas
+    .filter(venta => venta.cantidad > 0) // Filtramos ventas con cantidad > 0
+    .reduce((diccionario, venta) => {
+        const ciudadRaw = venta.ciudad.trim().toLowerCase(); // Normalizamos la ciudad para evitar problemas de mayúsculas/minúsculas y espacios duplicados
+        const ciudad = ciudadRaw.charAt(0).toUpperCase() + ciudadRaw.slice(1); // Capitalizamos la primera letra de la ciudad
+
+        diccionario[ciudad] = (diccionario[ciudad] || 0) + valorVenta(venta); // Sumamos el valor de la venta a la ciudad correspondiente, si la ciudad no existe en el diccionario, la inicializamos en 0 y luego sumamos el valor de la venta.
+        return diccionario;
+    }, {});// Inicializamos el diccionario como un objeto vacío
+}
+
+//unidades por producto
+function unidadesPorProducto(ventas) {
+    return ventas
+    .filter(venta => venta.cantidad > 0) // Filtramos ventas con cantidad > 0
+    .reduce((diccionario, venta) => {
+        const producto = venta.producto.trim(); // Normalizamos el nombre del producto para evitar problemas de espacios duplicados
+
+        diccionario[producto] = (diccionario[producto] || 0) + venta.cantidad; // Sumamos la cantidad de la venta al producto correspondiente
+        return diccionario;
+    }, {});// Inicializamos el diccionario como un objeto vacío
+}
+//top k productos por valor generado
+function topProductosPorValor(ventas, k) {
+    const dineroPorProducto = ventas
+    .filter(venta => venta.cantidad > 0) // Filtramos ventas con cantidad > 0
+    .reduce((diccionario, venta) => {
+        const producto = venta.producto.trim(); // Normalizamos el nombre del producto para evitar problemas de espacios duplicados
+
+        diccionario[producto] = (diccionario[producto] || 0) + valorVenta(venta); // Sumamos el valor de la venta al producto correspondiente
+        return diccionario;
+    }, {});// Inicializamos el diccionario como un objeto vacío
+
+
+//convertimos el diccionario en un arreglo de objetos
+const listaProductos = Object.entries(dineroPorProducto).map(([producto, total]) => ({ producto, total }));
+
+// Ordenamos los productos de mayor a menor usando el operador de propagacion [...]
+return [...listaProductos].sort((a, b) => b.total - a.total).slice(0, k); // Devolvemos los primeros k productos
+}
+
+/////////////////////////////////////////////////////////////
+// Exportamos las funciones para que puedan ser utilizadas en otros archivos
 module.exports = {
     valorVenta,
     totalVendido,
     unidadesVendidas,
     ventaMayor,
     ticketPromedio,
-    ventasPorCiudad
+    ventasPorCiudad,
+    totalVendidoM,
+    unidadesVendidasM,
+    ventasPorCiudadM,
+    totalPorCiudad,
+    unidadesPorProducto,
+    topProductosPorValor
 };
+
