@@ -146,6 +146,26 @@ const listaProductos = Object.entries(dineroPorProducto).map(([producto, total])
 return [...listaProductos].sort((a, b) => b.total - a.total).slice(0, k); // Devolvemos los primeros k productos
 }
 
+
+//ventas del día
+function ventasDelDia(ventas, fechaBuscada) {
+    const ventasFiltradas = ventas.filter(v => v.fecha === fechaBuscada && v.cantidad > 0);
+    
+    const totalDinero = ventasFiltradas.reduce((acc, v) => acc + valorVenta(v), 0);
+    const totalUnidades = ventasFiltradas.reduce((acc, v) => acc + v.cantidad, 0);
+    
+    // Si no hay ventas, el ticket promedio debe retornar 0 en lugar de NaN
+    const ticketProm = ventasFiltradas.length > 0 ? totalDinero / ventasFiltradas.length : 0;
+
+    return {
+        fecha: fechaBuscada,
+        transacciones: ventasFiltradas.length,
+        totalDinero,
+        totalUnidades,
+        ticketPromedio: ticketProm
+    };
+}
+
 /////////////////////////////////////////////////////////////
 // Exportamos las funciones para que puedan ser utilizadas en otros archivos
 module.exports = {
@@ -160,6 +180,7 @@ module.exports = {
     ventasPorCiudadM,
     totalPorCiudad,
     unidadesPorProducto,
-    topProductosPorValor
+    topProductosPorValor,
+    ventasDelDia
 };
 

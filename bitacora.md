@@ -121,3 +121,21 @@ Las funciones fueron probadas y validadas con tres escenarios diferentes:
 - **Qué transformo?:** Transformamos el objeto diccionario de agrupaciones en un arreglo plano de objetos usando `.map(([producto, total]) => ({ producto, total }))`.
 - **Qué acumulo?:** El dinero total generado por cada producto mediante `.reduce()`.
 - **¿Cómo agrupo y ordeno?:** Agrupamos por producto en un diccionario de dinero, luego convertimos a arreglo, ordenamos de forma descendente usando `.sort((a, b) => b.total - a.total)` sobre una copia inmutable (`[...]`), y recortamos con `.slice(0, k)`.
+
+## Registro de Depuración (Debugging v0.1)
+
+### Error 1: Duplicidad de ciudades en agrupaciones (ej. "Bogotá" y "Bogotá ")
+* **Síntoma:** Al agrupar las ventas por ciudad, la ciudad de Bogotá aparecía listada dos veces de forma independiente, separando sus totales de venta.
+* **Entrada que lo produce:** Registros con variaciones de espacios en blanco o minúsculas en la propiedad `ciudad` (ej. `"Bogotá"` vs `" Bogotá "` o `"medellín"`).
+* **Hipótesis:** El objeto diccionario usaba directamente el valor crudo del campo `ciudad` como clave, interpretando cadenas con espacios o mayúsculas distintas como llaves únicas en memoria.
+* **Prueba realizada:** Impresión por consola (`console.log`) de las claves crudas del diccionario antes de acumular.
+* **Causa:** Falta de normalización previa de las cadenas de texto dentro de la función de agrupación (`reduce`).
+* **Corrección:** Aplicar una función de limpieza sistemática en el reducer: `const ciudadRaw = venta.ciudad.trim().toLowerCase();` seguida de la capitalización inicial `ciudadRaw.charAt(0).toUpperCase() + ciudadRaw.slice(1);`.
+
+### Error 2: Aparición de `NaN` (Not a Number) al filtrar un día sin ventas
+* **Síntoma:** Al calcular indicadores (como el ticket promedio) para fechas donde no existían transacciones, el resultado devuelto era `NaN` en lugar de un valor monetario o numérico en cero.
+* **Entrada que lo produce:** Un arreglo filtrado vacío `[]` enviado a funciones de división (suma total dividida entre cantidad de transacciones).
+* **Hipótesis:** Se estaba realizando una división matemática (`total / cantidad`) donde la cantidad de transacciones válidas era `0`, resultando en una indeterminación matemática (`0 / 0 = NaN`).
+* **Prueba realizada:** Ejecución de pruebas con arreglos vacíos o fechas inexistentes y monitoreo con `console.log` del divisor.
+* **Causa:** Ausencia de una guarda condicional (validación de límites) antes de efectuar la división de promedios.
+* **Corrección:** Implementación de un operador ternario de seguridad: `const ticketProm = ventasFiltradas.length > 0 ? totalDinero / ventasFiltradas.length : 0;` que intercepta los divisores en cero y retorna `0` de forma controlada.
