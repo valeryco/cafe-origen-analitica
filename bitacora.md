@@ -139,3 +139,12 @@ Las funciones fueron probadas y validadas con tres escenarios diferentes:
 * **Prueba realizada:** Ejecución de pruebas con arreglos vacíos o fechas inexistentes y monitoreo con `console.log` del divisor.
 * **Causa:** Ausencia de una guarda condicional (validación de límites) antes de efectuar la división de promedios.
 * **Corrección:** Implementación de un operador ternario de seguridad: `const ticketProm = ventasFiltradas.length > 0 ? totalDinero / ventasFiltradas.length : 0;` que intercepta los divisores en cero y retorna `0` de forma controlada.
+
+## predicciones de crecimiento 
+
+si el tamano de entrada n se multiplica por 10 (de 100 a 1.000, de 1.000 a 10.000 y de 10.000 a 100.000):
+
+- totalVendidoInstrumentado: las operaciones deberian multiplicarse aproximadamente por 10, porque el ciclo revisa cada registro una vez.     w
+- ventaMayorInstrumentado: las operaciones deberian multiplicarse aproximadamente por 10, ya que visita cada elemento y lo compara contra el maximo actual.
+- totalPorCiudadInstrumentado: las operaciones deberian multiplicarse aproximadamente por 10, porque recorre el arreglo una vez y evalua cada venta valida.
+- primeraVenta: las operaciones deberian mantenerse iguales (1 operacion), sin importar cuanto crezca n, porque accede directo al primer elemento.

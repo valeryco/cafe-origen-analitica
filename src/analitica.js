@@ -164,6 +164,59 @@ function ventasDelDia(ventas, fechaBuscada) {
         totalUnidades,
         ticketPromedio: ticketProm
     };
+
+function totalVendidoInstrumentado(ventas, contador) { // visita cada venta del arreglo y suma 1 al contador en cada visita y en cada comparacion de cantidad
+    let total = 0;
+    for (const venta of ventas) {
+        contador.operaciones +=1; //visita un elemento del arreglo
+
+        contador.operaciones +=1; //comparacion venta.cantidad>0
+        if (venta.cantidad > 0){
+            total += venta.cantidad * venta.precio;
+        }
+    }
+    return total;
+}
+
+function ventaMayorInstrumentado(ventas, contador){
+    contador.operaciones +=1;//visita un elemento del arreglo
+    if (ventas.length===0){
+        return null;
+    }
+    
+    let mayor = ventas[0];
+    let maxValor=mayor.cantidad * mayor.precio;
+
+    for (const venta of ventas) {
+        contador.operaciones += 1;//comparación valorActual>maxValor
+        if (valorActual > maxValor){
+            maxValor = valorActual;
+            mayor = venta
+        }
+    }
+    return mayor;
+}
+
+function totalPorCiudadInstrumentado(ventas, contador){
+    const acumulado ={};
+
+    for (const venta of ventas){
+        contador.operaciones +=1; //visita un elemento del arreglo
+
+        contador.operaciones +=1;//comparación venta.cantidad>0
+        if (venta.cantidad > 0){
+            const limpia = venta.ciudad.trim().toLowerCase;
+            const ciudad = limpia.charAt(0).toUpperCase() + limpia.slice(1);
+
+            contador.operaciones +=1;//comparación para verificar si la ciudad ya existe
+            if (!acumulado[ciudad]){
+                acumulado[ciudad]=0;
+            }
+            acumulado[ciudad] += venta.cantidad * venta.precio;
+        }   
+    }
+    return acumulado;
+}
 }
 
 /////////////////////////////////////////////////////////////
@@ -181,6 +234,9 @@ module.exports = {
     totalPorCiudad,
     unidadesPorProducto,
     topProductosPorValor,
-    ventasDelDia
+    ventasDelDia,
+    totalVendidoInstrumentado,
+    ventaMayorInstrumentado,
+    totalPorCiudadInstrumentado
 };
 
